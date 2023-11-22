@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   Tree,
@@ -11,17 +12,20 @@ import {
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
-  name: string;
+  name!: string;
 
   @Column({ nullable: true })
-  parentId: number;
+  parentId?: number;
 
   @TreeParent()
-  parent: User;
+  parent?: User;
 
   @TreeChildren()
-  children: User[];
+  children?: User[];
+
+  @CreateDateColumn()
+  createdAt!: Date;
 }
