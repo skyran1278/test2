@@ -1,9 +1,15 @@
+import { join } from 'path';
+
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -24,6 +30,21 @@ import { AppService } from './app.service';
         logging: !!configService.get('DB_LOGGING'),
       }),
     }),
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      useFactory: (): ApolloDriverConfig => {
+        return {
+          autoSchemaFile: {
+            path: join(process.cwd(), 'src/schema.gql'),
+          },
+          sortSchema: true,
+          playground: false,
+          /** @see https://www.apollographql.com/docs/apollo-server/data/context/ */
+          plugins: [ApolloServerPluginLandingPageLocalDefault()],
+        };
+      },
+    }),
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
